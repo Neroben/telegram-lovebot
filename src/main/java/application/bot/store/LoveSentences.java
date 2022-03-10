@@ -52,6 +52,7 @@ public class LoveSentences {
         try (BufferedReader br = new BufferedReader(new FileReader(loveFile, StandardCharsets.UTF_8))) {
             loveList = br.lines()
                     .filter(love -> !wasLove.contains(love))
+                    .filter(love -> !love.isEmpty())
                     .collect(Collectors.toList());
         }
     }
