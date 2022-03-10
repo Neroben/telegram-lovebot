@@ -1,5 +1,6 @@
 package application.bot.store;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -19,7 +20,7 @@ public class LoveSentences {
 
     public LoveSentences() throws IOException {
         Set<String> wasLove = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sdont\\IdeaProjects\\TelegramBot\\src\\main\\resources\\was.txt", StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(new ClassPathResource("was.txt").getPath(), StandardCharsets.UTF_8))) {
             while (br.ready()) {
                 wasLove.add(br.readLine());
             }
@@ -32,11 +33,11 @@ public class LoveSentences {
     }
 
     private void cleanWasFile() throws IOException {
-        new FileOutputStream("C:\\Users\\sdont\\IdeaProjects\\TelegramBot\\src\\main\\resources\\was.txt").close();
+        new FileOutputStream(new ClassPathResource("was.txt").getPath()).close();
     }
 
     private void initLoveSentences(Set<String> wasLove) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sdont\\IdeaProjects\\TelegramBot\\src\\main\\resources\\love.txt", StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(new ClassPathResource("love.txt").getPath(), StandardCharsets.UTF_8))) {
             while (br.ready()) {
                 String love = br.readLine();
                 if (!wasLove.contains(love)) {
@@ -59,7 +60,7 @@ public class LoveSentences {
     }
 
     private void setWasLove(String love) throws IOException {
-        Files.write(Paths.get("C:\\Users\\sdont\\IdeaProjects\\TelegramBot\\src\\main\\resources\\was.txt"), (love + NEWLINE).getBytes(), StandardOpenOption.APPEND);
+        Files.write(Paths.get(new ClassPathResource("was.txt").getPath()), (love + NEWLINE).getBytes(), StandardOpenOption.APPEND);
     }
 
 }

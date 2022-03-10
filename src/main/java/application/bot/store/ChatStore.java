@@ -1,5 +1,6 @@
 package application.bot.store;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -17,7 +18,7 @@ public class ChatStore {
     private final Set<String> chatIdSet = new HashSet<>();
 
     public ChatStore() throws IOException {
-        try(BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sdont\\IdeaProjects\\TelegramBot\\src\\main\\resources\\chat.txt", StandardCharsets.UTF_8))) {
+        try(BufferedReader br = new BufferedReader(new FileReader(new ClassPathResource("chat.txt").getPath(), StandardCharsets.UTF_8))) {
             while (br.ready()) {
                 chatIdSet.add(br.readLine());
             }
@@ -27,7 +28,7 @@ public class ChatStore {
     public boolean save(String chatId)  {
         if (chatIdSet.add(chatId)) {
             try {
-                Files.write(Paths.get("C:\\Users\\sdont\\IdeaProjects\\TelegramBot\\src\\main\\resources\\was.txt"), (chatId + '\n').getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get(new ClassPathResource("was.txt").getPath()), (chatId + '\n').getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 e.printStackTrace();
             }
