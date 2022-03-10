@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class LoveSentences {
 
     private static final Random random = new Random();
+    public static final String LINE_SEPARATOR = System.lineSeparator();
     public final String loveFile = Paths.get("src/main/resources/love.txt").toAbsolutePath().toString();
     public final String wasFile = Paths.get("src/main/resources/was.txt").toAbsolutePath().toString();
 
@@ -31,6 +32,10 @@ public class LoveSentences {
             cleanWasFile();
             initLoveSentences(Set.of());
         }
+    }
+
+    public void store(String message) {
+        loveList.add(message);
     }
 
     private Set<String> initWasSentences() throws IOException {
@@ -64,7 +69,19 @@ public class LoveSentences {
     }
 
     private void setWasLove(String love) throws IOException {
-        Files.writeString(Paths.get(wasFile), love + System.lineSeparator(), StandardOpenOption.APPEND);
+        Files.writeString(Paths.get(wasFile), love + LINE_SEPARATOR, StandardOpenOption.APPEND);
     }
 
+    public int getSizeLoveList() {
+        return loveList.size();
+    }
+
+    @Override
+    public String toString() {
+        return "LoveSentences{" +
+                "loveFile='" + loveFile + LINE_SEPARATOR +
+                ", wasFile='" + wasFile + LINE_SEPARATOR +
+                ", loveList=" + loveList +
+                '}';
+    }
 }

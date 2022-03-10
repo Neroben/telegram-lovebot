@@ -1,6 +1,7 @@
 package application.bot;
 
 import application.bot.store.ChatStore;
+import application.bot.store.LoveSentences;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
@@ -8,20 +9,48 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class Telegram {
 
-    public Telegram(ChatStore chatStore, TelegramBot telegramBot) {
+    private final ChatStore chatStore;
+    private final TelegramBot telegramBot;
+    private final LoveSentences loveSentences;
+
+    public Telegram(ChatStore chatStore, TelegramBot telegramBot, LoveSentences loveSentences) {
+        this.chatStore = chatStore;
+        this.telegramBot = telegramBot;
+        this.loveSentences = loveSentences;
         telegramBot.setUpdatesListener(updates -> {
-            saveChat(chatStore, telegramBot, updates);
+            updates.forEach(this::proceedMessage);
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         });
     }
 
-    private void saveChat(ChatStore chatStore, TelegramBot telegramBot, List<Update> updates) {
-        Long chatId = updates.get(0).message().chat().id();
+    private void proceedMessage(Update update) {
+        String text = update.message().text();
+        if (text.startsWith("<-ADMIN->")) {
+            String[] command = text.split(" ");
+            switch (command[1]) {
+                case "INFO" -> proceedInfo(update);
+                case "+" -> loveSentences.store(command[2]);
+                case "GET_ALL" -> telegramBot.execute(new SendMessage(update.message().chat().id(),
+                        loveSentences.toString()));
+                default -> saveChat(update.message().chat().id());
+            }
+
+        } else {
+            saveChat(update.message().chat().id());
+        }
+
+    }
+
+    private void proceedInfo(Update update) {
+        telegramBot.execute(new SendMessage(update.message().chat().id(), "Осталось сообщений : "
+                + loveSentences.getSizeLoveList()));
+    }
+
+    private void saveChat(Long chatId) {
         try {
             if (chatStore.save(Long.toString(chatId))) {
                 telegramBot.execute(new SendMessage(chatId, "Я тебя запомнил. Это бот любви! Жди 9:30"));
