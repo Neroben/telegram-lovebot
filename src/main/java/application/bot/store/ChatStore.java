@@ -10,30 +10,25 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatStore {
 
     public final String chatFile = Paths.get("src/main/resources/chat.txt").toAbsolutePath().toString();
-    private final Set<String> chatIdSet = new HashSet<>();
+    private final Set<String> chatIdSet;
 
     public ChatStore() throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(chatFile, StandardCharsets.UTF_8))) {
-            while (br.ready()) {
-                chatIdSet.add(br.readLine());
-            }
+            chatIdSet = br.lines().collect(Collectors.toSet());
         }
     }
 
-    public boolean save(String chatId) {
+    public boolean save(String chatId) throws IOException {
         if (chatIdSet.add(chatId)) {
-            try {
-                Files.write(Paths.get("src/main/resources/was.txt").toAbsolutePath(), (chatId + '\n').getBytes(), StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Files.writeString(Paths.get("src/main/resources/was.txt").toAbsolutePath(),
+                    chatId + System.lineSeparator(), StandardOpenOption.APPEND);
             return true;
         }
         return false;

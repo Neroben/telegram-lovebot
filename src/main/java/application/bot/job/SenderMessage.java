@@ -28,7 +28,7 @@ public class SenderMessage {
             try {
                 telegramBot.execute(new SendMessage(chatId, loveSentences.getRandom()));
             } catch (IOException e) {
-                e.printStackTrace();
+                telegramBot.execute(new SendMessage(chatId, "У меня ошибка, я хочу плакать, " + e.getMessage()));
             }
         });
     }

@@ -10,29 +10,32 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class LoveSentences {
 
     private static final Random random = new Random();
-    public static final char NEWLINE = '\n';
     public final String loveFile = Paths.get("src/main/resources/love.txt").toAbsolutePath().toString();
     public final String wasFile = Paths.get("src/main/resources/was.txt").toAbsolutePath().toString();
 
-    private final List<String> loveList = new ArrayList<>();
+    private List<String> loveList;
 
     public LoveSentences() throws IOException {
-        Set<String> wasLove = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(wasFile, StandardCharsets.UTF_8))) {
-            while (br.ready()) {
-                wasLove.add(br.readLine());
-            }
-        }
+        Set<String> wasLove = initWasSentences();
         initLoveSentences(wasLove);
         if (loveList.isEmpty()) {
             cleanWasFile();
             initLoveSentences(Set.of());
+        }
+    }
+
+    private Set<String> initWasSentences() throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(wasFile, StandardCharsets.UTF_8))) {
+            return br.lines().collect(Collectors.toSet());
         }
     }
 
@@ -42,12 +45,9 @@ public class LoveSentences {
 
     private void initLoveSentences(Set<String> wasLove) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(loveFile, StandardCharsets.UTF_8))) {
-            while (br.ready()) {
-                String love = br.readLine();
-                if (!wasLove.contains(love)) {
-                    loveList.add(love);
-                }
-            }
+            loveList = br.lines()
+                    .filter(love -> !wasLove.contains(love))
+                    .collect(Collectors.toList());
         }
     }
 
@@ -56,7 +56,7 @@ public class LoveSentences {
         String love = loveList.get(index);
         setWasLove(love);
         loveList.remove(index);
-        if(loveList.isEmpty()) {
+        if (loveList.isEmpty()) {
             cleanWasFile();
             initLoveSentences(Set.of());
         }
@@ -64,7 +64,7 @@ public class LoveSentences {
     }
 
     private void setWasLove(String love) throws IOException {
-        Files.write(Paths.get(wasFile), (love + NEWLINE).getBytes(), StandardOpenOption.APPEND);
+        Files.writeString(Paths.get(wasFile), love + System.lineSeparator(), StandardOpenOption.APPEND);
     }
 
 }
