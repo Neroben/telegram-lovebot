@@ -33,7 +33,7 @@ public class Telegram {
             String[] command = text.split(" ");
             switch (command[1]) {
                 case "INFO" -> proceedInfo(update);
-                case "+" -> loveSentences.store(command[2]);
+                case "+" -> loveSentences.store(text.substring(12));
                 case "GET_ALL" -> telegramBot.execute(new SendMessage(update.message().chat().id(),
                         loveSentences.toString()));
                 default -> saveChat(update.message().chat().id());
