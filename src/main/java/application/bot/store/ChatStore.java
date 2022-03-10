@@ -1,9 +1,10 @@
 package application.bot.store;
 
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,20 +16,21 @@ import java.util.Set;
 @Service
 public class ChatStore {
 
+    public final String chatFile = Paths.get("src/main/resources/chat.txt").toAbsolutePath().toString();
     private final Set<String> chatIdSet = new HashSet<>();
 
     public ChatStore() throws IOException {
-        try(BufferedReader br = new BufferedReader(new FileReader(new ClassPathResource("chat.txt").getPath(), StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(chatFile, StandardCharsets.UTF_8))) {
             while (br.ready()) {
                 chatIdSet.add(br.readLine());
             }
         }
     }
 
-    public boolean save(String chatId)  {
+    public boolean save(String chatId) {
         if (chatIdSet.add(chatId)) {
             try {
-                Files.write(Paths.get(new ClassPathResource("was.txt").getPath()), (chatId + '\n').getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get("src/main/resources/was.txt").toAbsolutePath(), (chatId + '\n').getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 e.printStackTrace();
             }
