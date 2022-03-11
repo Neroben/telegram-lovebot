@@ -22,7 +22,7 @@ public class SenderMessage {
         this.loveSentences = loveSentences;
     }
 
-    @Scheduled(cron = "0 30 9 * * *")
+    @Scheduled(cron = "0 0 10 * * *")
     public void sendMessage() {
         chatStore.getChatIdSet().forEach(chatId -> {
             try {
